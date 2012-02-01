@@ -6,8 +6,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'Google::Directions',
     AUTHOR              => q{Robin Clarke <perl@robinclarke.net>},
-    VERSION_FROM        => 'lib/Google/Directions.pm',
-    ABSTRACT_FROM       => 'lib/Google/Directions.pm',
+    VERSION_FROM        => 'lib/Google/Directions/Client.pm',
+    ABSTRACT_FROM       => 'lib/Google/Directions/Client.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
       : ()),

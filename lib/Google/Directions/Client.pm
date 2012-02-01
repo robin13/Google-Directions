@@ -1,4 +1,4 @@
-package Google::Directions;
+package Google::Directions::Client;
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
@@ -7,6 +7,9 @@ use URL::Encode qw/url_encode/;
 use LWP::UserAgent;
 use YAML;
 use Carp;
+use Try::Tiny;
+use Encode qw/encode_utf8/;
+use Google::Directions::Response;
 
 =head1 NAME
 
@@ -33,20 +36,28 @@ Perhaps a little code snippet.
     ...
 
 =cut
-has 'keep_alive'            => ( is => 'ro', isa => 'Int',  required => 1, default => 1              );
+has 'keep_alive'            => ( is => 'ro', isa => 'Int',  required => 1, default => 0              );
 has 'user_agent'            => ( 
     is          => 'ro', 
     isa         => 'LWP::UserAgent',
     writer      => '_set_user_agent',
     predicate   => '_has_user_agent',
     );
+has 'cache'                 => ( is => 'ro', isa => 'Cache::FileCache' );
+
 
 # Create a LWP::UserAgent if necessary
 around 'user_agent' => sub {
     my $orig = shift;
     my $self = shift;
     unless( $self->_has_user_agent ){
-        $self->_set_user_agent( LWP::UserAgent->new( 'keep_alive' => $self->keep_alive ) );
+	if( $self->keep_alive ){
+	    carp( "Warning - keep_alive gives unreliable results - partial JSON returned\n" );
+	}
+	my $ua = LWP::UserAgent->new(
+	    'keep_alive' => $self->keep_alive,
+	    );
+        $self->_set_user_agent( $ua );
     }
     return $self->$orig;
 };
@@ -66,7 +77,7 @@ sub directions {
         waypoints           => { isa => 'ArrayRef[Str]', optional => 1 },
         alternatives        => { isa => 'Bool', optional => 1 },
         avoid               => { isa => 'ArrayRef[Str]', optional => 1 },
-        units               => { isa => 'Str', default => 'metric' },
+        #units               => { isa => 'Str', default => 'metric' }, # value is always in meters, only affects text, so irrelevant for exact computation
         region              => { isa => 'Str', optional => 1 },
         sensor              => { isa => 'Bool', default => 0 },
     );
@@ -97,12 +108,38 @@ sub directions {
 
     my $url = sprintf( 'https://maps.googleapis.com/maps/api/directions/json?%s',
                 join( '&', @query_params ) );
-    my $response = $self->user_agent->get( $url );
+
+    my $response;
+    if( $self->cache ){
+        $response = $self->cache->get( $url );
+    }
+
+    if( not $response ){
+        $response = $self->user_agent->get( $url );
+    }
+
     if( not $response->is_success ){
         croak( "Query failed: " . $response->status_line );
     }
-    my $data = decode_json( $response->decoded_content );
-    return $data;
+    if( $self->cache ){
+        $self->cache->set( $url, $response );
+    }
+
+    open( my $fh, '>', '/tmp/google_data.txt' ) or die( $! );
+    print $fh Dump( $response->decoded_content );
+    close $fh;
+
+    my $data = try{
+	return decode_json( encode_utf8( $response->decoded_content ) );
+    }catch{
+	#open( my $fh, '>', '/tmp/google_response.txt' ) or die( $! );
+	#print $fh Dump( $response );
+	#close $fh;
+	croak( $_ );
+    };
+
+    my $google_response = Google::Directions::Response->new( $data );
+    return $google_response;
 }
 
 
