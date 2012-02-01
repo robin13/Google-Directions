@@ -1,6 +1,19 @@
 package Google::Directions::Response::Polyline;
 use Moose;
 use Moose::Util::TypeConstraints;
+=head1 NAME
+
+Google::Directions::Response::Polyline - sequence of points making a polyline
+
+=head1 SYNOPSIS
+
+    my $poly = $route->overview_polyline();
+    foreach( @{ $poly->points } ){
+        # Do something with the coordinates...
+    }
+
+=cut
+
 
 subtype 'ArrayRefOfPoints',
     as 'ArrayRef';
@@ -10,10 +23,19 @@ coerce 'ArrayRefOfPoints',
     via { _decode_points( $_ ) };
 
 
+=head1 ATTRIBUTES
+
+=over 4
+
+=item I<points> ArrayRef of L<Google::Directions::Response::Coordinates>
+
+=back
+
+=cut
 
 has 'points' => ( is => 'ro', isa => 'ArrayRefOfPoints', coerce => 1 );
 
-# Credit goes to  Allen Day in Geo::Google for these methods
+# Credit goes to  Allen Day in Geo::Google for the original form of these methods
 sub _decode_word {
     my $quintets = shift;
     my @quintets = split '', $quintets;
@@ -91,30 +113,23 @@ sub _decode_points {
         $i++;
     }
 
-    # Prettify results
     return \@coordinates;
 }
 
 1;
 
-=head1 NAME
-
-
-=head1 DESCRIPTION
-
-
-=head1 METHODS
-
-=over 4
-
-
-=back
-
-=head1 COPYRIGHT
-
-Copyright 2011, Robin Clarke, Munich, Germany
-
 =head1 AUTHOR
 
-Robin Clarke <perl@robinclarke.net>
+Robin Clarke, C<< <perl at robinclarke.net> >>
 
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Robin Clarke.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

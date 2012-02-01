@@ -23,20 +23,41 @@ Version 0.01
 
 our $VERSION = '0.01';
 
+=head1 DESCRIPTION
+
+An interface to Google Maps Directions API V3.
+
+More details about what the API can do can be found on the L<API website|http://code.google.com/apis/maps/documentation/directions/>
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+    use Google::Directions::Client;
 
-Perhaps a little code snippet.
+    my $goog = Google::Directions::Client->new();
+    my $response = $goog->directions(
+        origin      => '25 Thompson Street, New York, NY, United States',
+        destination => '34 Lafayette Street, New York, NY, United States',
+        );
 
-    use Google::Directions;
+=head1 ATTRIBUTES
 
-    my $foo = Google::Directions->new();
-    ...
+=over 4
+
+=item I<keep_alive> Enable keep_alive for the user agent.
+
+B<Warning:> This causes occasional errors due to partial content being returned... I'm not sure
+what the root cause for this is... :(
+
+=item I<user_agent> Define a custom L<LWP::UserAgent> if you like.
+
+=item I<cache> Define a Cache::FileCache if you would like to have results cached for better performance
+
+=back
 
 =cut
+
 has 'keep_alive'            => ( is => 'ro', isa => 'Int',  required => 1, default => 0              );
+
 has 'user_agent'            => ( 
     is          => 'ro', 
     isa         => 'LWP::UserAgent',
@@ -51,8 +72,9 @@ around 'user_agent' => sub {
     my $orig = shift;
     my $self = shift;
     unless( $self->_has_user_agent ){
-	if( $self->keep_alive ){
-	    carp( "Warning - keep_alive gives unreliable results - partial JSON returned\n" );
+	if( $self->keep_alive and not $ENV{NO_WARN_KEEPALIVE} ){
+	    carp( "Warning - keep_alive gives unreliable results - partial JSON returned\n" .
+                "Set the enviroment variable NO_WARN_KEEPALIVE to hide this warning\n" );
 	}
 	my $ua = LWP::UserAgent->new(
 	    'keep_alive' => $self->keep_alive,
@@ -65,6 +87,32 @@ around 'user_agent' => sub {
 =head1 METHODS
 
 =head2 directions 
+
+Returns a L<Google::Directions::Response>
+
+=head3 params
+
+See the API documentation L<here|http://code.google.com/apis/maps/documentation/directions/#RequestParameters> for details
+
+=over 4 
+
+=item I<origin> $string
+
+=item I<destination> $string
+
+=item I<mode> $string (Default: 'driving')
+
+=item I<waypoints> ArrayRef[$string] (optional)
+
+=item I<alternatives> $boolean (Default: 0)
+
+=item I<avoid> ArrayRef[$string] (optional)
+
+=item I<region> $string (optional)
+
+=item I<sensor> $boolean (Default: 0)
+
+=back
 
 =cut
 
