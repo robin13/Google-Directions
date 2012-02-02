@@ -208,7 +208,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Google::Directions
+    perldoc Google::Directions::Client
 
 
 You can also look for information at:
