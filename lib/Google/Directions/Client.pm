@@ -5,7 +5,6 @@ use MooseX::Params::Validate;
 use JSON qw/decode_json/;
 use URL::Encode qw/url_encode/;
 use LWP::UserAgent;
-use YAML;
 use Carp;
 use Try::Tiny;
 use Encode qw/encode_utf8/;
@@ -17,11 +16,11 @@ Google::Directions - Query directions from the google maps directions API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 
@@ -173,16 +172,9 @@ sub directions {
         $self->cache->set( $url, $response );
     }
 
-    open( my $fh, '>', '/tmp/google_data.txt' ) or die( $! );
-    print $fh Dump( $response->decoded_content );
-    close $fh;
-
     my $data = try{
 	return decode_json( encode_utf8( $response->decoded_content ) );
     }catch{
-	#open( my $fh, '>', '/tmp/google_response.txt' ) or die( $! );
-	#print $fh Dump( $response );
-	#close $fh;
 	croak( $_ );
     };
 
