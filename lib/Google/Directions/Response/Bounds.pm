@@ -1,7 +1,6 @@
 package Google::Directions::Response::Bounds;
 use Moose;
-use Moose::Util::TypeConstraints;
-use Google::Directions::Response::Coordinates;
+use Google::Directions::Types qw/:all/;
 
 =head1 NAME
 
@@ -14,10 +13,6 @@ Google::Directions::Response::Bounds - The bounds for a route
     ...
 
 =cut
-
-coerce 'Google::Directions::Response::Coordinates',
-    from 'HashRef',
-    via { Google::Directions::Response::Coordinates->new( $_ ) };
 
 =head1 ATTRIBUTES
 
@@ -34,9 +29,9 @@ happens
 
 =cut
 
-has 'northeast'     => ( is => 'ro', isa => 'Google::Directions::Response::Coordinates',
+has 'northeast'     => ( is => 'ro', isa => Coordinates,
     required => 1, coerce => 1 );
-has 'southwest'     => ( is => 'ro', isa => 'Google::Directions::Response::Coordinates',
+has 'southwest'     => ( is => 'ro', isa => Coordinates,
     required => 1, coerce => 1 );
 
 1;

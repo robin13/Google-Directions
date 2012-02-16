@@ -1,6 +1,7 @@
 package Google::Directions::Response::Leg;
 use Moose;
 use Moose::Util::TypeConstraints;
+use Google::Directions::Types qw/:all/;
 use Google::Directions::Response::Coordinates;
 use Google::Directions::Response::Step;
 
@@ -13,25 +14,6 @@ Google::Directions::Response::Leg - An leg of a journey within a route
     my $first_route = shift( @{ $response->routes } );
     my @legs = @{ $first_route->legs };
     ...
-
-=cut
-
-subtype 'ArrayRefOfSteps',
-    as 'ArrayRef',
-    where { 
-        my $arrayref = $_;
-        foreach( @{ $arrayref } ){
-            if( not ref( $_ ) or ref( $_ ) ne 'Google::Directions::Response::Step' ){
-                return 0;
-            }
-        }
-        return 1;
-    },
-    message { "Not all elements of the ArrayRef are Google::Direction::Response::Step objects" };
-
-coerce 'ArrayRefOfSteps',
-    from 'ArrayRef[HashRef]',
-    via { [ map{ Google::Directions::Response::Step->new( $_ ) } @{ $_ } ] };
 
 =head1 ATTRIBUTES
 
@@ -57,28 +39,28 @@ See API documentation L<here|http://code.google.com/apis/maps/documentation/dire
 
 =cut
 
-has 'distance'      => ( is => 'ro', isa => 'ValueFromHashRef',
+has 'distance'      => ( is => 'ro', isa => ValueFromHashRef,
     coerce      => 1, 
     required    => 1,
     );
 
-has 'duration'      => ( is => 'ro', isa => 'ValueFromHashRef',
+has 'duration'      => ( is => 'ro', isa => ValueFromHashRef,
     coerce      => 1, 
     required    => 1,
     );
 has 'end_address'   => ( is => 'ro', isa => 'Str' );
-has 'end_location'  => ( is => 'ro', isa => 'Google::Directions::Response::Coordinates',
+has 'end_location'  => ( is => 'ro', isa => Coordinates,
     coerce      => 1,
     required    => 1,
     );
 
 has 'start_address'   => ( is => 'ro', isa => 'Str' );
-has 'start_location'  => ( is => 'ro', isa => 'Google::Directions::Response::Coordinates',
+has 'start_location'  => ( is => 'ro', isa => Coordinates,
     coerce      => 1,
     required    => 1,
     );
 
-has 'steps' => ( is => 'ro', isa => 'ArrayRefOfSteps',
+has 'steps' => ( is => 'ro', isa => ArrayRefOfSteps,
     coerce     => 1,
     );
 

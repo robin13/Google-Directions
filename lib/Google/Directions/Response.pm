@@ -1,10 +1,6 @@
 package Google::Directions::Response;
 use Moose;
-use Moose::Util::TypeConstraints;
-use Google::Directions::Response::Route;
-use Google::Directions::Response::Leg;
-use Google::Directions::Response::Step;
-use Google::Directions::Response::Coordinates;
+use Google::Directions::Types qw/:all/;
 
 =head1 NAME
 
@@ -35,26 +31,8 @@ See API documentation L<here|http://code.google.com/apis/maps/documentation/dire
 
 =cut
 
-subtype 'ArrayRefOfRoutes',
-    as 'ArrayRef',
-    where { 
-        my $arrayref = $_;
-        foreach( @{ $arrayref } ){
-            if( not ref( $_ ) or ref( $_ ) ne 'Google::Directions::Response::Route' ){
-                return 0;
-            }
-        }
-        return 1;
-    },
-    message { "Not all elements of the ArrayRef are Google::Direction::Response::Route objects" };
-
-coerce 'ArrayRefOfRoutes'
-    => from 'ArrayRef[HashRef]'
-        => via { [ map{ Google::Directions::Response::Route->new( $_ ) } @{ $_ } ] };
-
-
-has 'status'        => ( is => 'ro', isa => 'StatusCode', required => 1 );
-has 'routes'        => ( is => 'ro', isa => 'ArrayRefOfRoutes', coerce => 1 );
+has 'status'        => ( is => 'ro', isa => StatusCode, required => 1 );
+has 'routes'        => ( is => 'ro', isa => ArrayRefOfRoutes, coerce => 1 );
 
 1;
 

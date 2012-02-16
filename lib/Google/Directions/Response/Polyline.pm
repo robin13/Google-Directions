@@ -1,6 +1,8 @@
 package Google::Directions::Response::Polyline;
 use Moose;
 use Moose::Util::TypeConstraints;
+use Google::Directions::Types qw/:all/;
+
 =head1 NAME
 
 Google::Directions::Response::Polyline - sequence of points making a polyline
@@ -14,11 +16,10 @@ Google::Directions::Response::Polyline - sequence of points making a polyline
 
 =cut
 
-
-subtype 'ArrayRefOfPoints',
+subtype ArrayRefOfPoints,
     as 'ArrayRef';
 
-coerce 'ArrayRefOfPoints',
+coerce ArrayRefOfPoints,
     from 'Str',
     via { _decode_points( $_ ) };
 
@@ -33,7 +34,7 @@ coerce 'ArrayRefOfPoints',
 
 =cut
 
-has 'points' => ( is => 'ro', isa => 'ArrayRefOfPoints', coerce => 1 );
+has 'points' => ( is => 'ro', isa => ArrayRefOfPoints, coerce => 1 );
 
 # Credit goes to  Allen Day in Geo::Google for the original form of these methods
 sub _decode_word {
