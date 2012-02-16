@@ -1,7 +1,8 @@
 package Google::Directions::Response::Polyline;
 use Moose;
+use Google::Directions::Types 'ArrayRefOfPoints';
+use Google::Directions::Response::Coordinates;
 use Moose::Util::TypeConstraints;
-use Google::Directions::Types qw/:all/;
 
 =head1 NAME
 

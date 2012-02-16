@@ -177,7 +177,6 @@ sub directions {
     }catch{
 	croak( $_ );
     };
-
     my $google_response = Google::Directions::Response->new( $data );
     return $google_response;
 }

@@ -1,6 +1,9 @@
 package Google::Directions::Response::Route;
 use Moose;
 use Google::Directions::Types qw/:all/;
+use Google::Directions::Response::Leg;
+use Google::Directions::Response::Bounds;
+use Google::Directions::Response::Polyline;
 
 =head1 NAME
 
@@ -35,7 +38,7 @@ See API documentation L<here|http://code.google.com/apis/maps/documentation/dire
 
 =cut
 
-has 'copyrights'        => ( is => 'ro', isa => Str,
+has 'copyrights'        => ( is => 'ro', isa => 'Str',
     required    => 1,
     );
 
@@ -49,9 +52,9 @@ has 'bounds'            => ( is => 'ro', isa => Bounds,
     coerce      => 1,
     );
 
-has 'summary'           => ( is => 'ro', isa => Str );
-has 'warnings'          => ( is => 'ro', isa => ArrayRef );
-has 'waypoint_order'    => ( is => 'ro', isa => ArrayRef );
+has 'summary'           => ( is => 'ro', isa => 'Str' );
+has 'warnings'          => ( is => 'ro', isa => 'ArrayRef' );
+has 'waypoint_order'    => ( is => 'ro', isa => 'ArrayRef' );
 
 has 'overview_polyline' => ( is => 'ro', isa => Polyline,
     coerce  => 1,

@@ -1,6 +1,7 @@
 package Google::Directions::Response;
 use Moose;
 use Google::Directions::Types qw/:all/;
+use Google::Directions::Response::Route;
 
 =head1 NAME
 

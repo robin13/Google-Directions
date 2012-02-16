@@ -94,31 +94,31 @@ coerce ValueFromHashRef,
 
 coerce Bounds,
     from HashRef,
-    via { Google::Directions::Response::Bounds->new( $_ ) };
+    via { Google::Directions::Response::Bounds->new( %{ $_ } ) };
 
 
 coerce Coordinates,
     from HashRef,
-    via { Google::Directions::Response::Coordinates->new( $_ ) };
+    via { Google::Directions::Response::Coordinates->new( %{ $_ } ) };
 
 coerce Polyline,
     from HashRef,
-    via { Google::Directions::Response::Polyline->new( $_ ) };
+    via { Google::Directions::Response::Polyline->new( %{ $_ } ) };
 
 
 coerce ArrayRefOfRoutes,
     from ArrayRef[HashRef],
-    via { [ map{ Google::Directions::Response::Route->new( $_ ) } @{ $_ } ] };
+    via { [ map{ Google::Directions::Response::Route->new( %{ $_ } ) } @{ $_ } ] };
 
 
 coerce ArrayRefOfSteps,
     from ArrayRef[HashRef],
-    via { [ map{ Google::Directions::Response::Step->new( $_ ) } @{ $_ } ] };
+    via { [ map{ Google::Directions::Response::Step->new( %{ $_ } ) } @{ $_ } ] };
 
 
 coerce ArrayRefOfLegs,
     from ArrayRef[HashRef],
-    via { [ map{ Google::Directions::Response::Leg->new( $_ ) } @{ $_ } ] };
+    via { [ map{ Google::Directions::Response::Leg->new( %{ $_ } ) } @{ $_ } ] };
 
 
 1;
