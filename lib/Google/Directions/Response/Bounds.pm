@@ -29,9 +29,9 @@ happens
 
 =cut
 
-has 'northeast'     => ( is => 'ro', isa => Coordinates,
+has 'northeast'     => ( is => 'ro', isa => CoordinatesClass,
     required => 1, coerce => 1 );
-has 'southwest'     => ( is => 'ro', isa => Coordinates,
+has 'southwest'     => ( is => 'ro', isa => CoordinatesClass,
     required => 1, coerce => 1 );
 
 1;

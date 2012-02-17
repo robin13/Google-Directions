@@ -15,13 +15,13 @@ use MooseX::Types -declare => [qw(
     ArrayRefOfPoints
     ArrayRefOfRoutes
     ArrayRefOfSteps
-    Bounds
-    Coordinates
-    Leg
-    Polyline
-    Route
+    BoundsClass
+    CoordinatesClass
+    LegClass
+    PolylineClass
+    RouteClass
     StatusCode
-    Step
+    StepClass
     TravelMode
     ValueFromHashRef
 )]; 
@@ -31,12 +31,12 @@ subtype StatusCode,
     where { $_ =~ m/^(OK|NOT_FOUND|ZERO_RESULTS|MAX_WAYPOINTS_EXCEEDED|INVALID_REQUEST|
           OVER_QUERY_LIMIT|REQUEST_DENIED|UNKNOWN_ERROR)/x };
 
-class_type Bounds,      { class => 'Google::Directions::Response::Bounds' };
-class_type Coordinates, { class => 'Google::Directions::Response::Coordinates' };
-class_type Polyline,    { class => 'Google::Directions::Response::Polyline' };
-class_type Route,       { class => 'Google::Directions::Response::Route' };
-class_type Step,        { class => 'Google::Directions::Response::Step' };
-class_type Leg,         { class => 'Google::Directions::Response::Leg' };
+class_type BoundsClass,      { class => 'Google::Directions::Response::Bounds' };
+class_type CoordinatesClass, { class => 'Google::Directions::Response::Coordinates' };
+class_type PolylineClass,    { class => 'Google::Directions::Response::Polyline' };
+class_type RouteClass,       { class => 'Google::Directions::Response::Route' };
+class_type StepClass,        { class => 'Google::Directions::Response::Step' };
+class_type LegClass,         { class => 'Google::Directions::Response::Leg' };
 
 
 subtype ArrayRefOfLegs,
@@ -92,16 +92,16 @@ coerce ValueFromHashRef,
     from HashRef,
     via { $_->{value} };
 
-coerce Bounds,
+coerce BoundsClass,
     from HashRef,
     via { Google::Directions::Response::Bounds->new( %{ $_ } ) };
 
 
-coerce Coordinates,
+coerce CoordinatesClass,
     from HashRef,
     via { Google::Directions::Response::Coordinates->new( %{ $_ } ) };
 
-coerce Polyline,
+coerce PolylineClass,
     from HashRef,
     via { Google::Directions::Response::Polyline->new( %{ $_ } ) };
 

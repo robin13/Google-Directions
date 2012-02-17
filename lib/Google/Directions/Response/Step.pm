@@ -59,13 +59,13 @@ has 'duration'      => ( is => 'ro', isa => ValueFromHashRef,
     required    => 1,
     );
 has 'end_address'   => ( is => 'ro', isa => 'Str' );
-has 'end_location'  => ( is => 'ro', isa => Coordinates,
+has 'end_location'  => ( is => 'ro', isa => CoordinatesClass,
     coerce      => 1,
     required    => 1,
     );
 
 has 'start_address'   => ( is => 'ro', isa => 'Str' );
-has 'start_location'  => ( is => 'ro', isa => Coordinates,
+has 'start_location'  => ( is => 'ro', isa => CoordinatesClass,
     coerce      => 1,
     required    => 1,
     );
@@ -74,7 +74,7 @@ has 'html_instructions' => ( is => 'ro', isa => 'Str' );
 
 has 'travel_mode'       => ( is => 'ro', isa => TravelMode );
 
-has 'polyline'          => ( is => 'ro', isa => Polyline,
+has 'polyline'          => ( is => 'ro', isa => PolylineClass,
     coerce  => 1,
     );
 

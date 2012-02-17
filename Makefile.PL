@@ -22,6 +22,7 @@ WriteMakefile(
 	'MooseX::Aliases'		=> 0,
 	'MooseX::Params::Validate'	=> 0,
 	'Test::More'			=> 0,
+	'Test::Mock::LWP::Dispatch'	=> 0,
 	'Try::Tiny'			=> 0,
 	'URL::Encode'			=> 0,
     },

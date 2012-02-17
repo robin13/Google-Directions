@@ -47,7 +47,7 @@ has 'legs'              => ( is => 'ro', isa => ArrayRefOfLegs,
     coerce      => 1,
     );
 
-has 'bounds'            => ( is => 'ro', isa => Bounds,
+has 'bounds'            => ( is => 'ro', isa => BoundsClass,
     required    => 1, 
     coerce      => 1,
     );
@@ -56,7 +56,7 @@ has 'summary'           => ( is => 'ro', isa => 'Str' );
 has 'warnings'          => ( is => 'ro', isa => 'ArrayRef' );
 has 'waypoint_order'    => ( is => 'ro', isa => 'ArrayRef' );
 
-has 'overview_polyline' => ( is => 'ro', isa => Polyline,
+has 'overview_polyline' => ( is => 'ro', isa => PolylineClass,
     coerce  => 1,
     );
 
