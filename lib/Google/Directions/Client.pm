@@ -1,6 +1,5 @@
 package Google::Directions::Client;
 use Moose;
-use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
 use JSON qw/decode_json/;
 use URL::Encode qw/url_encode/;
@@ -16,11 +15,11 @@ Google::Directions - Query directions from the google maps directions API
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
