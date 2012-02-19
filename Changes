@@ -1,5 +1,49 @@
-Revision history for Google-Directions
+Date:      2012-02-19 10:34:19 +0100
+Revision:  (HEAD, 0.06, origin/master, github/master, master)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Cleaned up Types (use enum where appropriate) Added respons.json to MANIFEST
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+Date:      2012-02-18 11:01:15 +0100
+Revision:  (0.05)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Added missing PREREQ_PM packages
 
+Date:      2012-02-17 11:16:52 +0100
+Revision:  (0.04, github/types, types)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Completed client unit test
+
+Date:      2012-02-16 18:55:45 +0100
+Revision: 
+Author:    Robin Clarke (robin@robinclarke.net)
+    Debugging errors in Types
+
+Date:      2012-02-16 16:30:39 +0100
+Revision:  (0.03)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Made Types package
+
+Date:      2012-02-02 11:45:33 +0100
+Revision:  (0.02)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Removed YAML dependancy
+
+Date:      2012-02-01 20:40:20 -0500
+Revision:  (tim/patch-1)
+Author:    Tim Heaney (oylenshpeegul@gmail.com)
+    $ perldoc Google::Directions No documentation found for "Google::Directions".
+
+Date:      2012-02-01 19:01:44 +0100
+Revision:  (0.01, tim/master)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Completed documentation
+
+Date:      2012-02-01 18:02:53 +0100
+Revision: 
+Author:    Robin Clarke (robin@robinclarke.net)
+    Got conversion of json to objects working
+
+Date:      2012-01-27 18:29:59 +0100
+Revision: 
+Author:    Robin Clarke (robin@robinclarke.net)
+    First
