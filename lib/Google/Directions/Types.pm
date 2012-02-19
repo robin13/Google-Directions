@@ -26,19 +26,55 @@ use MooseX::Types -declare => [qw(
     ValueFromHashRef
 )]; 
 
-subtype StatusCode,
-    as Str,
-    where { $_ =~ m/^(OK|NOT_FOUND|ZERO_RESULTS|MAX_WAYPOINTS_EXCEEDED|INVALID_REQUEST|
-          OVER_QUERY_LIMIT|REQUEST_DENIED|UNKNOWN_ERROR)/x };
 
+# Bounds
 class_type BoundsClass,      { class => 'Google::Directions::Response::Bounds' };
+
+coerce BoundsClass,
+    from HashRef,
+    via { Google::Directions::Response::Bounds->new( %{ $_ } ) };
+
+# Coordinates
 class_type CoordinatesClass, { class => 'Google::Directions::Response::Coordinates' };
+
+coerce CoordinatesClass,
+    from HashRef,
+    via { Google::Directions::Response::Coordinates->new( %{ $_ } ) };
+
+
+# Polyline
 class_type PolylineClass,    { class => 'Google::Directions::Response::Polyline' };
+
+coerce PolylineClass,
+    from HashRef,
+    via { Google::Directions::Response::Polyline->new( %{ $_ } ) };
+
+# Route
 class_type RouteClass,       { class => 'Google::Directions::Response::Route' };
+
+# Step
 class_type StepClass,        { class => 'Google::Directions::Response::Step' };
+
+# Leg
 class_type LegClass,         { class => 'Google::Directions::Response::Leg' };
 
+# Valid status codes
+enum StatusCode, [ qw/OK NOT_FOUND ZERO_RESULTS MAX_WAYPOINTS_EXCEEDED INVALID_REQUEST
+                    OVER_QUERY_LIMIT REQUEST_DENIED UNKNOWN_ERROR/ ];
 
+# Valid travel modes
+enum TravelMode, [ qw/DRIVING WALKING BICYCLING/ ];
+
+# A number in the value key of a hashref
+subtype ValueFromHashRef,
+    as Num;
+
+coerce ValueFromHashRef,
+    from HashRef,
+    via { $_->{value} };
+
+# Array of legs
+# TODO: RCL 2012-02-19 neater/faster/more compact way of doing this?
 subtype ArrayRefOfLegs,
     as ArrayRef,
     where { 
@@ -52,6 +88,13 @@ subtype ArrayRefOfLegs,
     },
     message { "Not all elements of the ArrayRef are Google::Direction::Response::Leg objects" };
 
+coerce ArrayRefOfLegs,
+    from ArrayRef[HashRef],
+    via { [ map{ Google::Directions::Response::Leg->new( %{ $_ } ) } @{ $_ } ] };
+
+
+# Array of routes
+# TODO: RCL 2012-02-19 neater/faster/more compact way of doing this?
 subtype ArrayRefOfRoutes,
     as ArrayRef,
     where { 
@@ -65,6 +108,13 @@ subtype ArrayRefOfRoutes,
     },
     message { "Not all elements of the ArrayRef are Google::Direction::Response::Route objects" };
 
+coerce ArrayRefOfRoutes,
+    from ArrayRef[HashRef],
+    via { [ map{ Google::Directions::Response::Route->new( %{ $_ } ) } @{ $_ } ] };
+
+
+# Array of steps
+# TODO: RCL 2012-02-19 neater/faster/more compact way of doing this?
 subtype ArrayRefOfSteps,
     as ArrayRef,
     where { 
@@ -78,47 +128,9 @@ subtype ArrayRefOfSteps,
     },
     message { "Not all elements of the ArrayRef are Google::Direction::Response::Step objects" };
 
-
-subtype TravelMode,
-      as Str,
-      where { $_ =~ m/^(DRIVING|WALKING|BICYCLING)$/ };
-
-subtype ValueFromHashRef,
-    as Num;
-
-
-
-coerce ValueFromHashRef,
-    from HashRef,
-    via { $_->{value} };
-
-coerce BoundsClass,
-    from HashRef,
-    via { Google::Directions::Response::Bounds->new( %{ $_ } ) };
-
-
-coerce CoordinatesClass,
-    from HashRef,
-    via { Google::Directions::Response::Coordinates->new( %{ $_ } ) };
-
-coerce PolylineClass,
-    from HashRef,
-    via { Google::Directions::Response::Polyline->new( %{ $_ } ) };
-
-
-coerce ArrayRefOfRoutes,
-    from ArrayRef[HashRef],
-    via { [ map{ Google::Directions::Response::Route->new( %{ $_ } ) } @{ $_ } ] };
-
-
 coerce ArrayRefOfSteps,
     from ArrayRef[HashRef],
     via { [ map{ Google::Directions::Response::Step->new( %{ $_ } ) } @{ $_ } ] };
-
-
-coerce ArrayRefOfLegs,
-    from ArrayRef[HashRef],
-    via { [ map{ Google::Directions::Response::Leg->new( %{ $_ } ) } @{ $_ } ] };
 
 
 1;

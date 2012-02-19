@@ -1,4 +1,5 @@
 Changes
+samples/response.json
 lib/Google/Directions/Client.pm
 lib/Google/Directions/Response/Bounds.pm
 lib/Google/Directions/Response/Coordinates.pm
