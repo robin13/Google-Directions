@@ -1,5 +1,10 @@
-Date:      2012-02-19 10:34:19 +0100
+Date:      2012-02-19 11:46:20 +0100
 Revision:  (HEAD, 0.06, origin/master, github/master, master)
+Author:    Robin Clarke (robin@robinclarke.net)
+    Wrote git log to Changes
+
+Date:      2012-02-19 10:34:19 +0100
+Revision: 
 Author:    Robin Clarke (robin@robinclarke.net)
     Cleaned up Types (use enum where appropriate) Added respons.json to MANIFEST
 

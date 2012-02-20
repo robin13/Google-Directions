@@ -1,13 +1,20 @@
 package Google::Directions::Client;
-use Moose;
-use MooseX::Params::Validate;
-use JSON qw/decode_json/;
-use URL::Encode qw/url_encode/;
-use LWP::UserAgent;
 use Carp;
-use Try::Tiny;
+use Digest::SHA qw/sha256_hex/;
 use Encode qw/encode_utf8/;
 use Google::Directions::Response;
+use JSON qw/decode_json/;
+use LWP::UserAgent;
+use Moose;
+use MooseX::Params::Validate;
+use MooseX::WithCache;
+use Try::Tiny;
+use URL::Encode qw/url_encode/;
+
+with 'MooseX::WithCache' => {
+    backend => 'Cache::FastMmap',
+    };
+
 
 =head1 NAME
 
@@ -15,11 +22,11 @@ Google::Directions - Query directions from the google maps directions API
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 DESCRIPTION
 
@@ -48,7 +55,14 @@ what the root cause for this is... :(
 
 =item I<user_agent> Define a custom L<LWP::UserAgent> if you like.
 
-=item I<cache> Define a Cache::FileCache if you would like to have results cached for better performance
+=item I<cache> Define a Cache::FastMmap if you would like to have results cached for better performance
+
+=item I<base_url> Default: C<https://maps.googleapis.com>
+
+=item I<api_path> Default: C</maps/api/directions/json>
+
+=item I<limit_path_length> limit is documented at 2048, but errors occur at 2047.. Default: 2046
+
 
 =back
 
@@ -62,8 +76,14 @@ has 'user_agent'            => (
     writer      => '_set_user_agent',
     predicate   => '_has_user_agent',
     );
-has 'cache'                 => ( is => 'ro', isa => 'Cache::FileCache' );
 
+has 'base_url'              => ( is => 'ro', isa => 'Str', 
+    default => 'https://maps.googleapis.com' );
+
+has 'api_path'              => ( is => 'ro', isa => 'Str',
+    default => '/maps/api/directions/json' );
+
+has 'limit_path_length'      => ( is => 'ro', isa => 'Int', default => 2046 );
 
 # Create a LWP::UserAgent if necessary
 around 'user_agent' => sub {
@@ -127,6 +147,7 @@ sub directions {
         region              => { isa => 'Str', optional => 1 },
         sensor              => { isa => 'Bool', default => 0 },
     );
+
     my @query_params;
     foreach( qw/origin destination mode units region/ ){
         if( defined( $params{$_} ) ){
@@ -134,6 +155,7 @@ sub directions {
                 $_, url_encode( $params{$_} ) ) );
         }
     }
+
     foreach( qw/alternatives sensor/ ){
         if( $params{$_} ){
             push( @query_params, sprintf( "%s=true", $_ ) );
@@ -141,42 +163,49 @@ sub directions {
             push( @query_params, sprintf( "%s=false", $_ ) );
         }
     }
+
     foreach my $key( qw/waypoints avoid/ ){
         if( defined( $params{$key} ) ){
-            push( @query_params, 
-                sprintf( "%s=%s",
-                    $key,
-                    join( '|', map{ url_encode{$_} } @{ $params{$key} } ),
-                    )
-                );
+            my $joined = join( '|', @{ $params{$key} } );
+            push( @query_params, sprintf( "%s=%s", $key, url_encode( $joined ) ) );
         }
     }
 
-    my $url = sprintf( 'https://maps.googleapis.com/maps/api/directions/json?%s',
-                join( '&', @query_params ) );
-
-    my $response;
-    if( $self->cache ){
-        $response = $self->cache->get( $url );
+    my $path = $self->api_path . '?' . join( '&', @query_params );
+    
+    # Make sure path is not too long
+    if( length( $path ) > $self->limit_path_length ){
+        croak( printf( "Path may not be more than %u characters but is %u\n",
+                $self->limit_path_length,
+                length( $path ),
+                ) );
     }
 
-    if( not $response ){
-        $response = $self->user_agent->get( $url );
+    my $url = $self->base_url . $path;
+    my $cache_key = sha256_hex( $url );
+    my $google_response = $self->cache_get( $cache_key );
+    if( $google_response ){
+        $google_response->set_cached( 1 );
     }
 
-    if( not $response->is_success ){
-        croak( "Query failed: " . $response->status_line );
-    }
-    if( $self->cache ){
-        $self->cache->set( $url, $response );
+    if( not $google_response ){
+        my $response = $self->user_agent->get( $url );
+
+        if( not $response->is_success ){
+            croak( "Query failed: " . $response->status_line );
+        }
+
+        my $data = try{
+            return decode_json( encode_utf8( $response->decoded_content ) );
+        }catch{
+            croak( $_ );
+        };
+        $google_response = Google::Directions::Response->new( $data );
+        if( $self->cache and not $self->cache_set( $cache_key, $google_response ) ){
+            carp( "Response not saved in cache - too big\n" );
+        }
     }
 
-    my $data = try{
-	return decode_json( encode_utf8( $response->decoded_content ) );
-    }catch{
-	croak( $_ );
-    };
-    my $google_response = Google::Directions::Response->new( $data );
     return $google_response;
 }
 

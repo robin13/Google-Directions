@@ -1,12 +1,19 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 10;
 use Test::Mock::LWP::Dispatch;
+use Cache::FastMmap;
 
 BEGIN {
     use_ok( 'Google::Directions::Client' ) || print "Bail out!\n";
 }
+
+my %params = (
+    origin      => "Theresienstr. 100, Munich, Germany",
+    destination => "Nymphenburger Straße 31, Munich, Germany",
+    waypoints	=> [ 'Schellingstr. 130, Munich, Germany', 'Winzererstr. 42, Munich, Germany' ],
+    );
 
 
 # Get the sample response
@@ -25,22 +32,50 @@ $mock_ua->map(qr{.*}, sub {
     return $response;
 });
 
-my $goog = Google::Directions::Client->new();
-my %params = (
-    origin      => "Theresienstr. 100, 80333 München, Germany",
-    destination => "Nymphenburger Straße 31, 80335 München, Germany",
+# This will generate a temporary cache which will be removed on destroy
+my $cache = Cache::FastMmap->new(
+    num_pages	=> 3,	    # We are only storing one result...
+    page_size	=> 16384,   # This is just big enough for the result
     );
 
-my $response = $goog->directions( %params );
+# Test client with cache
+my $client_with_cache = Google::Directions::Client->new(
+    cache   => $cache,
+    );
+
+my $response = $client_with_cache->directions( %params );
+ok( ! $response->cached, 'first response not cached' );
+$response = $client_with_cache->directions( %params );
+ok( $response->cached, 'second response to same query cached' );
+
+# Test client without a cache
+my $client_no_cache = Google::Directions::Client->new();
+$response = $client_no_cache->directions( %params );
+$response = $client_no_cache->directions( %params );
+ok( ! $response->cached, 'not cached if cache not used' );
+
+# Make sure we have found a route
 my $first_route = $response->routes->[0];
 ok( $first_route, 'has first route' );
 
-my $first_leg = $first_route->legs->[0];
-ok( $first_leg, 'has first leg' );
-ok( $first_leg->duration == 258, 'duration matches expected' );
-ok( $first_leg->distance == 1301, 'distance matches expected' );
+# See if the sum of duration, distance and number of legs is right
+my $duration = 0;
+my $distance = 0;
+my $leg_count = 0;
+my $first_leg = undef;
+foreach my $leg( @{ $first_route->legs } ){
+    $first_leg ||= $leg;
+    $leg_count++;
+    $duration += $leg->duration;
+    $distance += $leg->distance;
+}
+ok( $leg_count == 3, 'has expected number of legs' );
+ok( $duration == 420, 'duration matches expected' );
+ok( $distance == 2946, 'distance matches expected' );
+
+# See if the addresses have been correctly transformed
 ok( $first_leg->start_address eq 'Theresienstraße 100, 80333 Munich, Germany', 
     'start address transformed correctly' );
-ok( $first_leg->end_address eq 'Nymphenburger Straße 31, 80335 Munich, Germany',
+ok( $first_leg->end_address eq 'Schellingstraße 130, 80797 Munich, Germany',
     'end address transformed correctly' );
 

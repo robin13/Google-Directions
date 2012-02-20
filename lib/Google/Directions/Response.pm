@@ -32,6 +32,7 @@ See API documentation L<here|http://code.google.com/apis/maps/documentation/dire
 
 =cut
 
+has 'cached'	    => ( is => 'rw', isa => 'Bool', writer => 'set_cached' );
 has 'status'        => ( is => 'ro', isa => StatusCode, required => 1 );
 has 'routes'        => ( is => 'ro', isa => ArrayRefOfRoutes, coerce => 1 );
 

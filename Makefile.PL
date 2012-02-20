@@ -14,6 +14,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
 	'Carp'				=> 0,
+	'Cache::FastMmap'		=> 0,
 	'Encode'			=> 0,
 	'JSON'				=> 0,
 	'LWP::UserAgent'		=> 0,
@@ -23,6 +24,8 @@ WriteMakefile(
 	'MooseX::Params::Validate'	=> 0,
 	'MooseX::Types'			=> 0,
 	'MooseX::Types::Moose'		=> 0,
+	'MooseX::WithCache'		=> 0,
+	'Digest::SHA'			=> 0,
 	'Test::Mock::LWP::Dispatch'	=> 0,
 	'Test::More'			=> 0,
 	'Try::Tiny'			=> 0,

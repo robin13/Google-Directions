@@ -1,6 +1,5 @@
 package Google::Directions::Response::Leg;
 use Moose;
-use Moose::Util::TypeConstraints;
 use Google::Directions::Types qw/:all/;
 use Google::Directions::Response::Coordinates;
 use Google::Directions::Response::Step;
