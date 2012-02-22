@@ -35,7 +35,7 @@ $mock_ua->map(qr{.*}, sub {
 # This will generate a temporary cache which will be removed on destroy
 my $cache = Cache::FastMmap->new(
     num_pages	=> 3,	    # We are only storing one result...
-    page_size	=> 16384,   # This is just big enough for the result
+    page_size	=> 32768,   # This is just big enough for the result
     );
 
 # Test client with cache
